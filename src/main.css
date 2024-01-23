@@ -1,0 +1,23 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+.checker, .checker--black {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #313131;
+  border-radius: 22.5px;
+  background-color: #F8F8F8;
+  box-shadow: 2px 2px 7.5px 0px rgba(0, 0, 0, 0.25);
+}
+
+.checker--black {
+  background-color: #313131;
+}
+
+/*# sourceMappingURL=main.css.map */
