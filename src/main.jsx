@@ -5,6 +5,10 @@ import './main.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>
-		<Cell></Cell>
+		<Cell
+			isBeige={true}
+			isClickable={true}
+			isPlayerBlack={true}>
+		</Cell>
 	</React.StrictMode>,
 )

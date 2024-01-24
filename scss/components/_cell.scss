@@ -1,0 +1,30 @@
+@use "../base/vars";
+
+.cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background-color: vars.$milk;
+
+    &.beige {
+        background-color: vars.$beige;
+    }
+
+    &.clickable {
+        border: 1px solid vars.$bright-blue;
+    }
+
+    &.clickable:hover {
+        background-color: vars.$bright-blue;
+    }
+
+    &.clickable.player-black {
+        border-color: vars.$bright-red;
+    }
+
+    &.clickable.player-black:hover {
+        background-color: vars.$bright-red;
+    }
+}
