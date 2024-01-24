@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+body {
+  margin: 0;
+}
+
 .checker, .checker--black {
   display: inline-flex;
   justify-content: center;
@@ -42,6 +46,17 @@
 }
 .cell.clickable.player-black:hover {
   background-color: #FF0000;
+}
+
+.board {
+  display: inline-flex;
+  flex-direction: column;
+  border: 10px solid var(--Brown, #76453B);
+  box-shadow: 4px 4px 25px 0px rgba(0, 0, 0, 0.1);
+}
+
+.row {
+  display: flex;
 }
 
 /*# sourceMappingURL=main.css.map */

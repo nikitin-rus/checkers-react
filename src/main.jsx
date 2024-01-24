@@ -1,14 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Cell from './components/Cell'
 import './main.css'
+import Board from './components/Board'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 	<React.StrictMode>
-		<Cell
-			isBeige={true}
-			isClickable={true}
-			isPlayerBlack={true}>
-		</Cell>
+		<Board></Board>
 	</React.StrictMode>,
 )
