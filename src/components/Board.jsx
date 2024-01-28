@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { getRowsCopy } from "../utils";
 import Row from "./Row";
 
-export default function Board({ rows, isPlayerBlack }) {
+export default function Board({ rows, isPlayerBlack, onMove }) {
     const [chosenChecker, setChosenChecker] = useState(null);
     const [clickableCells, setClickableCells] = useState([]);
     const moveDirections = {
@@ -17,7 +18,7 @@ export default function Board({ rows, isPlayerBlack }) {
         'bk': [[-1, -1], [-1, 1], [1, -1], [1, 1]],
     };
 
-    function findClickableCells(isPlayerBlack) {
+    function getClickableCells() {
         const coords = [];
 
         for (let i = 0; i < rows.length; i++) {
@@ -36,8 +37,7 @@ export default function Board({ rows, isPlayerBlack }) {
                         )
                     ) &&
                     (
-                        findMoves(i, j).length ||
-                        findJumps(i, j).length
+                        getCellsToMove(i, j).length
                     )
                 ) {
                     coords.push([i, j]);
@@ -48,61 +48,108 @@ export default function Board({ rows, isPlayerBlack }) {
         return coords;
     }
 
-    function findMoves(rowIndex, columnIndex) {
-        const moves = [];
-        const checker = rows[rowIndex][columnIndex];
+    function getCellsToMove(rowIndex, columnIndex) {
+        const cellsToMove = [];
+        const color = rows[rowIndex][columnIndex];
 
-        if (checker !== 'wk' && checker !== 'bk') {
-            moveDirections[checker].forEach(([rowDelta, columnDelta]) => {
-                if (rows[rowIndex + rowDelta]?.[columnIndex + columnDelta] === null) {
-                    moves.push([rowIndex + rowDelta, columnIndex + columnDelta]);
+        if (color !== 'wk' && color !== 'bk') {
+            moveDirections[color].forEach(([rowDelta, columnDelta]) => {
+                const targetColor = rows[rowIndex + rowDelta]?.[columnIndex + columnDelta];
+
+                if (targetColor === null) {
+                    cellsToMove.push([rowIndex + rowDelta, columnIndex + columnDelta]);
                 }
             });
-        }
-
-        return moves;
-    }
-
-    function findJumps(rowIndex, columnIndex) {
-        const jumps = [];
-        const checker = rows[rowIndex][columnIndex];
-
-        if (checker !== 'wk' && checker !== 'bk') {
-            jumpDirections[checker].forEach(([rowDelta, columnDelta]) => {
-                const victim = rows[rowIndex + rowDelta]?.[columnIndex + columnDelta];
-                const target = rows[rowIndex + rowDelta * 2]?.[columnIndex + columnDelta * 2];
+            jumpDirections[color].forEach(([rowDelta, columnDelta]) => {
+                const victimColor = rows[rowIndex + rowDelta]?.[columnIndex + columnDelta];
+                const targetColor = rows[rowIndex + rowDelta * 2]?.[columnIndex + columnDelta * 2];
 
                 if (
-                    victim &&
-                    victim !== checker &&
-                    target === null
+                    victimColor !== null &&
+                    victimColor !== color &&
+                    targetColor === null
                 ) {
-                    jumps.push({
-                        victim: [rowIndex + rowDelta, columnIndex + columnDelta],
-                        target: [rowIndex + rowDelta * 2, columnIndex + columnDelta * 2],
-                    });
+                    cellsToMove.push([rowIndex + rowDelta * 2, columnIndex + columnDelta * 2]);
                 }
             });
         }
 
-        return jumps;
+        return cellsToMove;
+    }
+
+    // function getCellsToJump(rowIndex, columnIndex) {
+    //     const jumps = [];
+    //     const checker = rows[rowIndex][columnIndex];
+
+    //     if (checker !== 'wk' && checker !== 'bk') {
+    //         jumpDirections[checker].forEach(([rowDelta, columnDelta]) => {
+    //             const victim = rows[rowIndex + rowDelta]?.[columnIndex + columnDelta];
+    //             const target = rows[rowIndex + rowDelta * 2]?.[columnIndex + columnDelta * 2];
+
+    //             if (
+    //                 victim &&
+    //                 victim !== checker &&
+    //                 target === null
+    //             ) {
+    //                 jumps.push({
+    //                     victim: [rowIndex + rowDelta, columnIndex + columnDelta],
+    //                     target: [rowIndex + rowDelta * 2, columnIndex + columnDelta * 2],
+    //                 });
+    //             }
+    //         });
+    //     }
+
+    //     return jumps;
+    // }
+
+    function handleCellClick(rowIndex, columnIndex, isClickable, hasChecker) {
+        if (!isClickable) return;
+        if (hasChecker) {
+            setChosenChecker({
+                rowIndex: rowIndex,
+                columnIndex: columnIndex,
+                color: rows[rowIndex][columnIndex],
+            });
+
+            const clickableCells = getClickableCells();
+            const cellsToMove = getCellsToMove(rowIndex, columnIndex);
+            setClickableCells([...clickableCells, ...cellsToMove]);
+        } else {
+            const {
+                rowIndex: chosenRowIndex,
+                columnIndex: chosenColumnIndex,
+                color: chosenColor
+            } = chosenChecker;
+
+            const copy = getRowsCopy(rows);
+
+            copy[chosenRowIndex][chosenColumnIndex] = null;
+            copy[rowIndex][columnIndex] = chosenColor;
+
+            const signRow = Math.sign(rowIndex - chosenRowIndex);
+            const signColumn = Math.sign(columnIndex - chosenColumnIndex);
+
+            for (
+                let i = chosenRowIndex + signRow,
+                j = chosenColumnIndex + signColumn;
+                i !== rowIndex && j !== columnIndex;
+                i += signRow,
+                j += signColumn
+            ) {
+                if (rows[i][j] !== null) {
+                    copy[i][j] = null;
+                }
+            }
+
+            onMove(copy);
+
+            setClickableCells([]);
+            setChosenChecker(null);
+        }
     }
 
     if (!clickableCells.length) {
-        setClickableCells(findClickableCells(isPlayerBlack));
-    }
-
-    function handleCellClick(rowIndex, columnIndex, isClickable) {
-        const checker = rows[rowIndex][columnIndex];
-
-        if (isClickable && checker) {
-            const coords = findClickableCells(isPlayerBlack);
-            const moves = findMoves(rowIndex, columnIndex);
-            const jumps = findJumps(rowIndex, columnIndex); 
-
-            setChosenChecker([rowIndex, columnIndex]);
-            setClickableCells(coords.concat(moves).concat(jumps.map(jump => jump.target)));
-        }
+        setClickableCells(getClickableCells());
     }
 
     return (

@@ -7,36 +7,41 @@ export default function Row({
     chosenChecker,
     isFirstCellBeige = false,
     isPlayerBlack = false,
-    onCellClick
+    onCellClick,
 }) {
     return (
         <div className="row">
             {cells.map((cell, columnIndex) => {
                 const isCellBeige = isFirstCellBeige ?
                     (columnIndex % 2 === 0) :
-                    (columnIndex % 2 !== 0)
+                    (columnIndex % 2 !== 0);
 
-                let isClickable = false;
-                for (const [i, j] of clickableCells) {
-                    if (i === rowIndex && j === columnIndex) {
-                        isClickable = true;
-                    }
-                }
+                const isCellClickable = clickableCells.some(([clickableRowIndex, clickableColumnIndex]) => {
+                    return (
+                        clickableRowIndex === rowIndex
+                        && clickableColumnIndex === columnIndex
+                    );
+                });
+
+                const isCellChosen = !!chosenChecker &&
+                    chosenChecker.rowIndex === rowIndex &&
+                    chosenChecker.columnIndex === columnIndex;
+
+                const isCellHasChecker = !!cell;
+                const isCellCheckerBlack = cell === "b" || cell === "bk";
 
                 return (
                     <Cell
                         key={columnIndex}
+                        rowIndex={rowIndex}
+                        columnIndex={columnIndex}
                         isBeige={isCellBeige}
-                        isClickable={isClickable}
-                        isChosen={
-                            chosenChecker &&
-                            chosenChecker[0] === rowIndex &&
-                            chosenChecker[1] === columnIndex
-                        }
+                        isClickable={isCellClickable}
+                        isChosen={isCellChosen}
                         isPlayerBlack={isPlayerBlack}
-                        hasChecker={!!cell}
-                        isCheckerBlack={cell === "b"}
-                        onClick={() => onCellClick(rowIndex, columnIndex, isClickable)}
+                        hasChecker={isCellHasChecker}
+                        isCheckerBlack={isCellCheckerBlack}
+                        onClick={onCellClick}
                     />
                 );
             })}

@@ -1,6 +1,8 @@
 import Checker from "./Checker";
 
 export default function Cell({
+    rowIndex,
+    columnIndex,
     isBeige = false,
     isClickable = false,
     isChosen = false,
@@ -17,7 +19,7 @@ export default function Cell({
             (isClickable ? " clickable" : "") +
             (isChosen ? " chosen" : "") +
             (isPlayerBlack ? " player-black" : "")
-        } onClick={onClick}>
+        } onClick={() => onClick(rowIndex, columnIndex, isClickable, hasChecker)}>
             {hasChecker && (
                 <Checker
                     isBlack={isCheckerBlack}
