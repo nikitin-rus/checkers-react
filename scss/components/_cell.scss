@@ -13,10 +13,11 @@
     }
 
     &.clickable {
-        border: 1px solid vars.$bright-blue;
+        border: 3px solid vars.$bright-blue;
     }
 
-    &.clickable:hover {
+    &.clickable:hover,
+    &.chosen {
         background-color: vars.$bright-blue;
     }
 
@@ -24,7 +25,9 @@
         border-color: vars.$bright-red;
     }
 
-    &.clickable.player-black:hover {
+    &.clickable.player-black:hover,
+    &.chosen.player-black {
         background-color: vars.$bright-red;
     }
+
 }
