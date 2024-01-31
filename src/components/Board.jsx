@@ -3,8 +3,9 @@ import { getRowsCopy } from "../utils";
 import Row from "./Row";
 
 export default function Board({ rows, isPlayerBlack, onMove }) {
-    const [chosenChecker, setChosenChecker] = useState(null);
     const [clickableCells, setClickableCells] = useState([]);
+    const [destroyedCells, setDestroyedCells] = useState([]);
+    const [chosenCells, setChosenCells] = useState([]);
     const moveDirections = {
         'w': [[-1, -1], [-1, 1]],
         'b': [[1, -1], [1, 1]],
@@ -18,26 +19,27 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
         'bk': [[-1, -1], [-1, 1], [1, -1], [1, 1]],
     };
 
-    function getClickableCells() {
+    function getCellsToChoose() {
         const coords = [];
 
         for (let i = 0; i < rows.length; i++) {
             for (let j = 0; j < rows[i].length; j++) {
-                const checker = rows[i][j];
+                const color = rows[i][j];
 
                 if (
                     (
                         (
                             !isPlayerBlack &&
-                            (checker === 'w' || checker === 'wk')
+                            (color === 'w' || color === 'wk')
                         ) ||
                         (
                             isPlayerBlack &&
-                            (checker === 'b' || checker === 'bk')
+                            (color === 'b' || color === 'bk')
                         )
                     ) &&
                     (
-                        getCellsToMove(i, j).length
+                        getCellsToMove(color, i, j).length ||
+                        getCellsToJump(color, i, j).length
                     )
                 ) {
                     coords.push([i, j]);
@@ -48,9 +50,10 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
         return coords;
     }
 
-    function getCellsToMove(rowIndex, columnIndex) {
+    // TODO: Добавить перемещение дамок
+
+    function getCellsToMove(color, rowIndex, columnIndex) {
         const cellsToMove = [];
-        const color = rows[rowIndex][columnIndex];
 
         if (color !== 'wk' && color !== 'bk') {
             moveDirections[color].forEach(([rowDelta, columnDelta]) => {
@@ -60,6 +63,15 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
                     cellsToMove.push([rowIndex + rowDelta, columnIndex + columnDelta]);
                 }
             });
+        }
+
+        return cellsToMove;
+    }
+
+    function getCellsToJump(color, rowIndex, columnIndex) {
+        const cellsToJump = [];
+
+        if (color !== 'wk' && color !== 'bk') {
             jumpDirections[color].forEach(([rowDelta, columnDelta]) => {
                 const victimColor = rows[rowIndex + rowDelta]?.[columnIndex + columnDelta];
                 const targetColor = rows[rowIndex + rowDelta * 2]?.[columnIndex + columnDelta * 2];
@@ -69,62 +81,29 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
                     victimColor !== color &&
                     targetColor === null
                 ) {
-                    cellsToMove.push([rowIndex + rowDelta * 2, columnIndex + columnDelta * 2]);
+                    cellsToJump.push([rowIndex + rowDelta * 2, columnIndex + columnDelta * 2]);
                 }
             });
         }
 
-        return cellsToMove;
+        return cellsToJump;
     }
-
-    // function getCellsToJump(rowIndex, columnIndex) {
-    //     const jumps = [];
-    //     const checker = rows[rowIndex][columnIndex];
-
-    //     if (checker !== 'wk' && checker !== 'bk') {
-    //         jumpDirections[checker].forEach(([rowDelta, columnDelta]) => {
-    //             const victim = rows[rowIndex + rowDelta]?.[columnIndex + columnDelta];
-    //             const target = rows[rowIndex + rowDelta * 2]?.[columnIndex + columnDelta * 2];
-
-    //             if (
-    //                 victim &&
-    //                 victim !== checker &&
-    //                 target === null
-    //             ) {
-    //                 jumps.push({
-    //                     victim: [rowIndex + rowDelta, columnIndex + columnDelta],
-    //                     target: [rowIndex + rowDelta * 2, columnIndex + columnDelta * 2],
-    //                 });
-    //             }
-    //         });
-    //     }
-
-    //     return jumps;
-    // }
 
     function handleCellClick(rowIndex, columnIndex, isClickable, hasChecker) {
         if (!isClickable) return;
+
         if (hasChecker) {
-            setChosenChecker({
-                rowIndex: rowIndex,
-                columnIndex: columnIndex,
-                color: rows[rowIndex][columnIndex],
-            });
+            const cellsToChoose = getCellsToChoose();
+            const cellsToMove = getCellsToMove(rows[rowIndex][columnIndex], rowIndex, columnIndex);
+            const cellsToJump = getCellsToJump(rows[rowIndex][columnIndex], rowIndex, columnIndex);
 
-            const clickableCells = getClickableCells();
-            const cellsToMove = getCellsToMove(rowIndex, columnIndex);
-            setClickableCells([...clickableCells, ...cellsToMove]);
+            setClickableCells([...cellsToChoose, ...cellsToMove, ...cellsToJump]);
+            setChosenCells([...chosenCells, [rowIndex, columnIndex]]);
         } else {
-            const {
-                rowIndex: chosenRowIndex,
-                columnIndex: chosenColumnIndex,
-                color: chosenColor
-            } = chosenChecker;
+            const [chosenRowIndex, chosenColumnIndex] = chosenCells[chosenCells.length - 1];
 
-            const copy = getRowsCopy(rows);
-
-            copy[chosenRowIndex][chosenColumnIndex] = null;
-            copy[rowIndex][columnIndex] = chosenColor;
+            let destroyedRowIndex = null;
+            let destroyedColumnIndex = null;
 
             const signRow = Math.sign(rowIndex - chosenRowIndex);
             const signColumn = Math.sign(columnIndex - chosenColumnIndex);
@@ -136,20 +115,68 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
                 i += signRow,
                 j += signColumn
             ) {
+                // console.log(`${i}-${j}`);
                 if (rows[i][j] !== null) {
-                    copy[i][j] = null;
+                    [destroyedRowIndex, destroyedColumnIndex] = [i, j];
+                    setDestroyedCells([...destroyedCells, [i, j]]);
                 }
             }
 
-            onMove(copy);
+            if (destroyedRowIndex && destroyedColumnIndex) {
+                const chosenColor = rows[chosenCells[0][0]][chosenCells[0][1]];
 
-            setClickableCells([]);
-            setChosenChecker(null);
+                const cellsToJump = getCellsToJump(chosenColor, rowIndex, columnIndex)
+                    .filter(([rowIndex, columnIndex]) => {
+                        return chosenCells.some(([chosenRowIndex, chosenColumnIndex]) => {
+                            return (
+                                rowIndex === chosenRowIndex &&
+                                columnIndex === chosenColumnIndex
+                            );
+                        }) === false;
+                    });
+
+                if (cellsToJump.length) {
+                    setClickableCells(cellsToJump);
+                    setChosenCells([...chosenCells, [rowIndex, columnIndex]]);
+                } else {
+                    const copy = getRowsCopy(rows);
+
+                    copy[chosenCells[0][0]][chosenCells[0][1]] = null;
+                    copy[rowIndex][columnIndex] = chosenColor;
+
+                    for (const [i, j] of destroyedCells) {
+                        copy[i][j] = null;
+                    }
+
+                    copy[destroyedRowIndex][destroyedColumnIndex] = null;
+
+                    onMove(copy);
+                    setClickableCells([]);
+                    setDestroyedCells([]);
+                    setChosenCells([]);
+                }
+            } else {
+                const copy = getRowsCopy(rows);
+                
+                copy[chosenRowIndex][chosenColumnIndex] = null;
+                copy[rowIndex][columnIndex] = rows[chosenRowIndex][chosenColumnIndex];
+                
+                onMove(copy);
+                setClickableCells([]);
+                setChosenCells([]);
+            }
         }
     }
 
+    // FIXME: Если getCellsToChoose возвращает пустой массив, то рендер компонента зацикливается 
     if (!clickableCells.length) {
-        setClickableCells(getClickableCells());
+        const cellsToChoose = getCellsToChoose();
+
+        if (cellsToChoose.length) {
+            // Игра окончена
+        } else {
+            setClickableCells(cellsToChoose);
+        }
     }
 
     return (
@@ -163,7 +190,7 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
                         cells={row}
                         rowIndex={i}
                         clickableCells={clickableCells}
-                        chosenChecker={chosenChecker}
+                        chosenCells={chosenCells}
                         isFirstCellBeige={isFirstCellBeige}
                         isPlayerBlack={isPlayerBlack}
                         onCellClick={handleCellClick}

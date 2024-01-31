@@ -7,7 +7,7 @@ export default function Game() {
         ['b', null, 'b', null, 'b', null, 'b', null],
         [null, 'b', null, 'b', null, 'b', null, 'b'],
         [null, null, null, null, null, null, null, null],
-        [null, null, null, 'b', null, null, null, null],
+        [null, null, null, null, null, null, null, null],
         ['w', null, 'w', null, 'w', null, 'w', null],
         [null, 'w', null, 'w', null, 'w', null, 'w'],
         ['w', null, 'w', null, 'w', null, 'w', null],
@@ -20,7 +20,9 @@ export default function Game() {
             <Board
                 rows={history[currentMove]}
                 isPlayerBlack={isPlayerBlack}
-                onMove={(rows) => setHistory([...history, rows])}
+                onMove={rows => {
+                    setHistory([...history, rows]);
+                }}
             />
             <div className={
                 "game__subtitle" +
