@@ -171,8 +171,9 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
     // FIXME: Если getCellsToChoose возвращает пустой массив, то рендер компонента зацикливается 
     if (!clickableCells.length) {
         const cellsToChoose = getCellsToChoose();
+        console.log(cellsToChoose);
 
-        if (cellsToChoose.length) {
+        if (!cellsToChoose.length) {
             // Игра окончена
         } else {
             setClickableCells(cellsToChoose);
