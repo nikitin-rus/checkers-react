@@ -4,8 +4,7 @@ import Row from "./Row";
 
 export default function Board({ rows, isPlayerBlack, onMove }) {
     const [clickableCells, setClickableCells] = useState([]);
-    const [destroyedCells, setDestroyedCells] = useState([]);
-    const [chosenCells, setChosenCells] = useState([]);
+    const [chosenCell, setChosenCell] = useState(null);
     const moveDirections = {
         'w': [[-1, -1], [-1, 1]],
         'b': [[1, -1], [1, 1]],
@@ -65,6 +64,10 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
             });
         }
 
+        if (color === 'wk' || color === 'bk') {
+            console.log(moveDirections[color]);
+        }
+
         return cellsToMove;
     }
 
@@ -98,72 +101,49 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
             const cellsToJump = getCellsToJump(rows[rowIndex][columnIndex], rowIndex, columnIndex);
 
             setClickableCells([...cellsToChoose, ...cellsToMove, ...cellsToJump]);
-            setChosenCells([...chosenCells, [rowIndex, columnIndex]]);
+            setChosenCell([rowIndex, columnIndex]);
         } else {
-            const [chosenRowIndex, chosenColumnIndex] = chosenCells[chosenCells.length - 1];
+            const copy = getRowsCopy(rows);
+            const [chosenRowIndex, chosenColumnIndex] = chosenCell;
+            const chosenColor = rows[chosenRowIndex][chosenColumnIndex];
 
-            let destroyedRowIndex = null;
-            let destroyedColumnIndex = null;
+            const rowDirection = Math.sign(rowIndex - chosenRowIndex);
+            const columnDirection = Math.sign(columnIndex - chosenColumnIndex);
 
-            const signRow = Math.sign(rowIndex - chosenRowIndex);
-            const signColumn = Math.sign(columnIndex - chosenColumnIndex);
+            copy[chosenRowIndex][chosenColumnIndex] = null;
+            copy[rowIndex][columnIndex] = chosenColor;
 
-            for (
-                let i = chosenRowIndex + signRow,
-                j = chosenColumnIndex + signColumn;
-                i !== rowIndex && j !== columnIndex;
-                i += signRow,
-                j += signColumn
-            ) {
-                // console.log(`${i}-${j}`);
-                if (rows[i][j] !== null) {
-                    [destroyedRowIndex, destroyedColumnIndex] = [i, j];
-                    setDestroyedCells([...destroyedCells, [i, j]]);
-                }
+            if (rows[rowIndex + rowDirection] === undefined) {
+                copy[rowIndex][columnIndex] = chosenColor === "w" ? "wk" : "bk";
             }
 
-            if (destroyedRowIndex && destroyedColumnIndex) {
-                const chosenColor = rows[chosenCells[0][0]][chosenCells[0][1]];
+            let i = chosenRowIndex + rowDirection;
+            let j = chosenColumnIndex + columnDirection;
 
-                const cellsToJump = getCellsToJump(chosenColor, rowIndex, columnIndex)
-                    .filter(([rowIndex, columnIndex]) => {
-                        return chosenCells.some(([chosenRowIndex, chosenColumnIndex]) => {
-                            return (
-                                rowIndex === chosenRowIndex &&
-                                columnIndex === chosenColumnIndex
-                            );
-                        }) === false;
-                    });
+            let isJump = false;
 
-                if (cellsToJump.length) {
-                    setClickableCells(cellsToJump);
-                    setChosenCells([...chosenCells, [rowIndex, columnIndex]]);
-                } else {
-                    const copy = getRowsCopy(rows);
-
-                    copy[chosenCells[0][0]][chosenCells[0][1]] = null;
-                    copy[rowIndex][columnIndex] = chosenColor;
-
-                    for (const [i, j] of destroyedCells) {
-                        copy[i][j] = null;
-                    }
-
-                    copy[destroyedRowIndex][destroyedColumnIndex] = null;
-
-                    onMove(copy);
-                    setClickableCells([]);
-                    setDestroyedCells([]);
-                    setChosenCells([]);
+            while (i !== rowIndex && j !== columnIndex) {
+                // console.log(`${i}-${j}`);
+                if (rows[i][j] !== null) {
+                    // console.log(`Шашка по координатам ${i}-${j} была перепрыгнута`);
+                    copy[i][j] = null;
+                    isJump = true;
                 }
+                i += rowDirection;
+                j += columnDirection;
+            }
+
+            let cellsToJump = [];
+            if (isJump) cellsToJump = getCellsToJump(copy[rowIndex][columnIndex], rowIndex, columnIndex);
+
+            if (isJump && cellsToJump.length) {
+                onMove(copy, isPlayerBlack);
+                setClickableCells(cellsToJump);
+                setChosenCell([rowIndex, columnIndex]);
             } else {
-                const copy = getRowsCopy(rows);
-                
-                copy[chosenRowIndex][chosenColumnIndex] = null;
-                copy[rowIndex][columnIndex] = rows[chosenRowIndex][chosenColumnIndex];
-                
-                onMove(copy);
+                onMove(copy, !isPlayerBlack);
                 setClickableCells([]);
-                setChosenCells([]);
+                setChosenCell(null);
             }
         }
     }
@@ -171,7 +151,6 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
     // FIXME: Если getCellsToChoose возвращает пустой массив, то рендер компонента зацикливается 
     if (!clickableCells.length) {
         const cellsToChoose = getCellsToChoose();
-        console.log(cellsToChoose);
 
         if (!cellsToChoose.length) {
             // Игра окончена
@@ -191,7 +170,7 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
                         cells={row}
                         rowIndex={i}
                         clickableCells={clickableCells}
-                        chosenCells={chosenCells}
+                        chosenCell={chosenCell}
                         isFirstCellBeige={isFirstCellBeige}
                         isPlayerBlack={isPlayerBlack}
                         onCellClick={handleCellClick}

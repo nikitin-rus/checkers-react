@@ -4,7 +4,7 @@ export default function Row({
     cells,
     rowIndex,
     clickableCells,
-    chosenCells,
+    chosenCell,
     isFirstCellBeige = false,
     isPlayerBlack = false,
     onCellClick,
@@ -18,20 +18,20 @@ export default function Row({
 
                 const isCellClickable = clickableCells.some(([clickableRowIndex, clickableColumnIndex]) => {
                     return (
-                        clickableRowIndex === rowIndex && 
+                        clickableRowIndex === rowIndex &&
                         clickableColumnIndex === columnIndex
                     );
                 });
 
-                const isCellChosen = chosenCells.some(([chosenRowIndex, chosenColumnIndex]) => {
-                    return (
-                        chosenRowIndex === rowIndex &&
-                        chosenColumnIndex === columnIndex
-                    );
-                });
+                const isCellChosen = (
+                    chosenCell &&
+                    chosenCell[0] === rowIndex &&
+                    chosenCell[1] === columnIndex
+                );
 
                 const isCellHasChecker = !!cell;
                 const isCellCheckerBlack = cell === "b" || cell === "bk";
+                const isCellCheckerKing = cell === "wk" || cell === "bk";
 
                 return (
                     <Cell
@@ -44,6 +44,7 @@ export default function Row({
                         isPlayerBlack={isPlayerBlack}
                         hasChecker={isCellHasChecker}
                         isCheckerBlack={isCellCheckerBlack}
+                        isCheckerKing={isCellCheckerKing}
                         onClick={onCellClick}
                     />
                 );
