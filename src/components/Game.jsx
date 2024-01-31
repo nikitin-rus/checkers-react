@@ -5,8 +5,8 @@ export default function Game() {
     const [history, setHistory] = useState([[
         [null, 'b', null, null, null, 'b', null, 'b'],
         ['b', null, 'b', null, 'w', null, 'b', null],
-        [null, 'b', null, 'b', null, 'b', null, 'b'],
-        [null, null, null, null, null, null, null, null],
+        [null, 'b', null, null, null, null, null, 'b'],
+        [null, null, 'b', null, null, null, 'b', null],
         [null, null, null, null, null, null, null, null],
         ['w', null, 'w', null, 'w', null, 'w', null],
         [null, 'w', null, 'w', null, 'w', null, 'w'],
