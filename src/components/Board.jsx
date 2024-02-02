@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { getRowsCopy } from "../utils";
 import Row from "./Row";
+import CoordinatesBar from "./CoordinatesBar";
 
 export default function Board({ rows, isPlayerBlack, onMove }) {
     const [clickableCells, setClickableCells] = useState([]);
@@ -102,12 +103,12 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
                 let i = rowIndex + rowDirection;
                 let j = columnIndex + columnDirection;
 
-                console.group();
-                console.log(`Direction (${rowDirection} : ${columnDirection})`);
+                // console.group();
+                // console.log(`Direction (${rowDirection} : ${columnDirection})`);
 
                 let isEnemyMet = false;
                 while (!isEnemyMet && rows[i] && rows[i][j] !== undefined) {
-                    console.log(`Checking cell on coordinates (${i} : ${j}). Color: ${rows[i][j]}`);
+                    // console.log(`Checking cell on coordinates (${i} : ${j}). Color: ${rows[i][j]}`);
                     if (
                         (color === 'wk' && ['b', 'bk'].includes(rows[i][j])) ||
                         (color === 'bk' && ['w', 'wk'].includes(rows[i][j]))
@@ -119,8 +120,8 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
                     j += columnDirection;
                 }
 
-                console.log(`Is enemy met: (${isEnemyMet})`);
-                console.groupEnd();
+                // console.log(`Is enemy met: (${isEnemyMet})`);
+                // console.groupEnd();
 
                 while (isEnemyMet && rows[i] && rows[i][j] === null) {
                     cellsToJump.push([i, j]);
@@ -194,7 +195,6 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
         }
     }
 
-    // FIXME: Если getCellsToChoose возвращает пустой массив, то рендер компонента зацикливается 
     if (!clickableCells.length) {
         const cellsToChoose = getCellsToChoose();
 
@@ -207,22 +207,32 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
 
     return (
         <div className="board">
-            {rows.map((row, i) => {
-                const isFirstCellBeige = (i % 2 !== 0);
+            <div className="board__coordinates-x">
+                <CoordinatesBar isHorizontal={true} />
+                <div className="board__coordinates-y">
+                    <CoordinatesBar />
+                    <div className="board__rows">
+                        {rows.map((row, i) => {
+                            const isFirstCellBeige = (i % 2 !== 0);
 
-                return (
-                    <Row
-                        key={i}
-                        cells={row}
-                        rowIndex={i}
-                        clickableCells={clickableCells}
-                        chosenCell={chosenCell}
-                        isFirstCellBeige={isFirstCellBeige}
-                        isPlayerBlack={isPlayerBlack}
-                        onCellClick={handleCellClick}
-                    />
-                );
-            })}
+                            return (
+                                <Row
+                                    key={i}
+                                    cells={row}
+                                    rowIndex={i}
+                                    clickableCells={clickableCells}
+                                    chosenCell={chosenCell}
+                                    isFirstCellBeige={isFirstCellBeige}
+                                    isPlayerBlack={isPlayerBlack}
+                                    onCellClick={handleCellClick}
+                                />
+                            );
+                        })}
+                    </div>
+                    <CoordinatesBar />
+                </div>
+                <CoordinatesBar isHorizontal={true} />
+            </div>
         </div>
     );
 }

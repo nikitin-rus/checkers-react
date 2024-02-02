@@ -30,6 +30,14 @@ body {
   line-height: normal;
 }
 
+.coordinate {
+  font-family: "Open Sans", sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
 .checker, .checker--black {
   display: inline-flex;
   justify-content: center;
@@ -72,9 +80,15 @@ body {
 
 .board {
   display: inline-flex;
-  flex-direction: column;
   border: 10px solid var(--Brown, #76453B);
   box-shadow: 4px 4px 25px 0px rgba(0, 0, 0, 0.1);
+}
+.board__coordinates-x {
+  display: flex;
+  flex-direction: column;
+}
+.board__coordinates-y {
+  display: flex;
 }
 
 .row {
@@ -89,6 +103,33 @@ body {
 }
 .game__subtitle.black {
   color: #313131;
+}
+
+.coordinate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 50px;
+  background-color: #F8FAE5;
+  color: #313131;
+}
+.coordinate.horizontal {
+  width: 50px;
+  height: 25px;
+}
+
+.coordinates-bar {
+  display: flex;
+  flex-direction: column;
+}
+.coordinates-bar.horizontal {
+  flex-direction: row;
+}
+.coordinates-bar__empty-square {
+  width: 25px;
+  height: 25px;
+  background-color: #F8FAE5;
 }
 
 /*# sourceMappingURL=main.css.map */

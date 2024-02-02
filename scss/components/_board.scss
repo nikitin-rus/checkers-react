@@ -1,6 +1,14 @@
 .board {
     display: inline-flex;
-    flex-direction: column;
     border: 10px solid var(--Brown, #76453B);
     box-shadow: 4px 4px 25px 0px rgba(0, 0, 0, 0.10);
+
+    &__coordinates-x {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__coordinates-y {
+        display: flex;
+    }
 }

@@ -1,0 +1,16 @@
+@use '../base/vars';
+
+.coordinates-bar {
+    display: flex;
+    flex-direction: column;
+
+    &.horizontal {
+        flex-direction: row;    
+    }
+
+    &__empty-square {
+        width: 25px;
+        height: 25px;
+        background-color: vars.$milk;
+    }
+}
