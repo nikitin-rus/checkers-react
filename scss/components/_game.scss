@@ -2,15 +2,29 @@
 
 .game {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
     text-align: center;
-
-    & .board {
-        margin-bottom: 36px;
+    row-gap: 40px;
+    
+    &__items-top {
+        display: flex;
+        column-gap: 40px;
     }
 
+    &__buttons {
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+        justify-content: center;
+        row-gap: 24px;
+    }
+
+    & .button {
+        justify-content: center;
+    }
+    
     &__info {
         color: vars.$white;
     }

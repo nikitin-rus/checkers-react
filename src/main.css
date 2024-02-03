@@ -38,6 +38,14 @@ body {
   line-height: normal;
 }
 
+.button {
+  font-family: "Open Sans", sans-serif;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
 .checker, .checker--black {
   display: inline-flex;
   justify-content: center;
@@ -97,13 +105,25 @@ body {
 
 .game {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   text-align: center;
+  row-gap: 40px;
 }
-.game .board {
-  margin-bottom: 36px;
+.game__items-top {
+  display: flex;
+  column-gap: 40px;
+}
+.game__buttons {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  justify-content: center;
+  row-gap: 24px;
+}
+.game .button {
+  justify-content: center;
 }
 .game__info {
   color: #F8F8F8;
@@ -139,6 +159,23 @@ body {
 .coordinates-bar__empty-square {
   width: 25px;
   height: 25px;
+  background-color: #F8FAE5;
+}
+
+.button {
+  display: flex;
+  padding: 12px;
+  background-color: #F8F8F8;
+  border: 1px solid #313131;
+  border-radius: 5px;
+  color: #313131;
+  box-shadow: 4px 4px 12.5px 0px rgba(0, 0, 0, 0.1);
+}
+.button:disabled {
+  background-color: #E0E0E0;
+  color: #5E5E5E;
+}
+.button:hover:not([disabled]) {
   background-color: #F8FAE5;
 }
 

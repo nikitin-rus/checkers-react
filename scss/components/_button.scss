@@ -1,0 +1,20 @@
+@use '../base/vars';
+
+.button {
+    display: flex;
+    padding: 12px;
+    background-color: vars.$white;
+    border: 1px solid vars.$black;
+    border-radius: 5px;
+    color: vars.$black;
+    box-shadow: 4px 4px 12.5px 0px rgba(0, 0, 0, 0.10);
+
+    &:disabled {
+        background-color: vars.$gray-1;
+        color: vars.$gray-2;
+    }
+
+    &:hover:not([disabled]) {
+        background-color: vars.$milk;
+    }
+}
