@@ -1,6 +1,8 @@
+@use '../base/vars';
+
 .board {
     display: inline-flex;
-    border: 10px solid var(--Brown, #76453B);
+    border: 10px solid vars.$brown;
     box-shadow: 4px 4px 25px 0px rgba(0, 0, 0, 0.10);
 
     &__coordinates-x {
