@@ -22,7 +22,7 @@ body {
   background-color: #43766C;
 }
 
-.game__subtitle {
+.game__info {
   font-family: "Open Sans", sans-serif;
   font-size: 36px;
   font-style: normal;
@@ -95,14 +95,24 @@ body {
   display: flex;
 }
 
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 .game .board {
   margin-bottom: 36px;
 }
-.game__subtitle {
+.game__info {
   color: #F8F8F8;
 }
-.game__subtitle.black {
+.game__info.black {
   color: #313131;
+}
+.game__win-msg, .game__move-msg {
+  margin: 0;
 }
 
 .coordinate {

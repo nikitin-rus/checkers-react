@@ -3,7 +3,7 @@ import { getRowsCopy } from "../utils";
 import Row from "./Row";
 import CoordinatesBar from "./CoordinatesBar";
 
-export default function Board({ rows, isPlayerBlack, onMove }) {
+export default function Board({ rows, isPlayerBlack, onMove, onEnd }) {
     const [clickableCells, setClickableCells] = useState([]);
     const [chosenCell, setChosenCell] = useState(null);
     const moveDirections = {
@@ -199,7 +199,7 @@ export default function Board({ rows, isPlayerBlack, onMove }) {
         const cellsToChoose = getCellsToChoose();
 
         if (!cellsToChoose.length) {
-            // Игра окончена
+            onEnd();
         } else {
             setClickableCells(cellsToChoose);
         }

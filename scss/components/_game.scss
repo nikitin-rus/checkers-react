@@ -1,15 +1,26 @@
 @use "../base/vars";
 
 .game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
     & .board {
         margin-bottom: 36px;
     }
 
-    &__subtitle {
+    &__info {
         color: vars.$white;
     }
 
-    &__subtitle.black {
+    &__info.black {
         color: vars.$black;
+    }
+
+    &__win-msg,
+    &__move-msg {
+        margin: 0;
     }
 }
