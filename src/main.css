@@ -131,7 +131,7 @@ body {
 .game__info.black {
   color: #313131;
 }
-.game__win-msg, .game__move-msg {
+.game__msg {
   margin: 0;
 }
 
