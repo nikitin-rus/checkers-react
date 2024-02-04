@@ -8,7 +8,7 @@ export default function Game() {
         ['b', null, 'b', null, 'b', null, 'b', null],
         [null, 'b', null, 'b', null, 'b', null, 'b'],
         [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
+        [null, null, null, null, null, 'wk', null, null],
         ['w', null, 'w', null, 'w', null, 'w', null],
         [null, 'w', null, 'w', null, 'w', null, 'w'],
         ['w', null, 'w', null, 'w', null, 'w', null],

@@ -89,8 +89,10 @@ export default function Board({ rows, isPlayerBlack, isInViewMode, onMove, onEnd
                 const targetColor = rows[rowIndex + rowDirection * 2]?.[columnIndex + columnDirection * 2];
 
                 if (
-                    victimColor !== null &&
-                    victimColor !== color &&
+                    (
+                        (color === 'w' && ['b', 'bk'].includes(victimColor)) ||
+                        (color === 'b' && ['w', 'wk'].includes(victimColor))
+                    ) &&
                     targetColor === null
                 ) {
                     cellsToJump.push([rowIndex + rowDirection * 2, columnIndex + columnDirection * 2]);
