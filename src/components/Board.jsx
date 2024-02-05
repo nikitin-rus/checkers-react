@@ -158,8 +158,8 @@ export default function Board({ rows, isPlayerBlack, isInViewMode, onMove, onEnd
             copy[rowIndex][columnIndex] = chosenColor;
 
             if (
-                rows[rowIndex + rowDirection] === undefined &&
-                (chosenColor === "w" || chosenColor === "b")
+                (chosenColor === "b" && rowIndex === 7) ||
+                (chosenColor === "w" && rowIndex === 0)
             ) {
                 copy[rowIndex][columnIndex] = (
                     chosenColor === "w" ? "wk" : "bk"
